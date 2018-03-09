@@ -1,0 +1,18 @@
+1. Tem main, #include, headers (que indicam as funções/variáveis a serem utilizadas)
+2. gcc -o nome nome.c
+3. [tipo] nome -> Guarda um espaço de memória definido
+4. char nome[10]; -> Array para declarar uma string. Define um espaço de memória estático
+5. Aponta para um determinado espaço de memória para onde está uma variável (i). Ao define int i está-se a definir um tamanho estático.
+Ao fazer p=&i , p está a apontar para o endereço de i. Ao fazer *p, manipula-se o conteúdo do espaço de memória.
+6. Um apontador guarda o endereço de memória que está a apontar.
+7. Aponta para o próximo endereço de memório. (Se incrementar o apontador).
+8. printf("%d",*p);
+9. É um ficheiro que guarda as funções e as bibliotecas utilizadas.
+12. Faz a compilação automática.
+13. O "a" ficaria a 5 bem como o *P. Se fizesse p apontaria para o próximo endereço de memória.
+
+
+
+
+
+
