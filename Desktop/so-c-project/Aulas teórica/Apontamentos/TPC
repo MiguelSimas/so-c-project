@@ -1,0 +1,15 @@
+Como é que o C faz a atribuicao caso seja:
+y = 2
+x = 10
+x*=y=10
+
+1 - Introduza uma string no vetor e imprima caratere a caratere os conteudos da string.
+
+2 - Pega na string e imprime ao contrário
+
+
+2018-03-01 TPC
+
+Ponto 3 do novo ficheiro PDF (GitHub)
+
+TPC BitBucket e explicar a funcionalidade
