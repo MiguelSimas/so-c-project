@@ -19,7 +19,7 @@ void main()
     char const *nome = "test";    //Parte modular do script, usado para o nome do ficheiro. ".txt" não é necessario no ubuntu linux
     int caracter;                 //Define o tipo de dados da variável caracter a integer (inteiro).
     ficheiro = fopen(nome, "r"); //Abre o ficheiro com a variável nome, neste caso "test" no modo leitura
-    ficheiro2 = fopen("teste2.txt", "w");
+    ficheiro2 = fopen("teste2.txt", "w"); //Cria um ficheiro no modo "Write" (escrever)
     while ((caracter = fgetc(ficheiro)) != EOF) //Percorre o ficheiro, caracter a caracter
     {
         if (caracter == 'a') // Se o caracter for a, muda-o para b e incrementa o contador de As alterados
