@@ -1,0 +1,11 @@
+7. Ao usar a flag -I IO_RUN_IMMEDIATE o cpu inicia a execução do processo que lançou E/S. Enquanto que ao usar a tag -I IO_RUN_LATER o processo E/S troca de processo quando é natural fazê-lo (depende do comportamento de troca de processo definido no PROCESS_SWITCH_BEHAVIOR), o processo de E/S é imediatamente retomado assim que o processo secundário terminar. Ao prioritizar os processos E/S reduz-se o delay na interação homem-máquina (exemplo, mexer o rato) e permite uma execução dos restantes processos mais eficiente, por exemplo, ao ler um ficheiro, se esse for lido até ao fim, qualquer outro processo que necessite de ler esse ficheiro, ao estar no buffer, permite uma resolução dos restantes processos mais rápida e eficiente. Finalmente, manter os devices ocupados garante uma maior utilização dos recursos disponíveis.
+
+
+
+8.
+-I IO_RUN_IMMEDIATE (Ao detetar uma um processo de E/S, muda imediatamente para este e prioritiza-o)
+-I IO RUN LATER(o processo E/S troca de processo quando é natural fazê-lo (depende do comportamento de troca de processo definido no PROCESS_SWITCH_BEHAVIOR)
+-S SWITCH_ON_IO
+o sistema troca quando ocorre um evento E/S
+-S SWITCH_ON_END
+o sistema vai apenas trocar quando o processo corrente termina
