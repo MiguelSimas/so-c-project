@@ -1,0 +1,11 @@
+Resposta às questões MOD1 CPU Intro V2
+1. Programa é um conjunto de instruções (passivo) e um processo (ativo) é o programa a ser executado dentro do sistema operativo.
+2. READY, WAITING, DONE, RUNNING (Espera de ser usado pelo CPU, Espera da entrada/saida, terminou, a ser executado)
+3. 
+Code - Codigo do programa; 
+Heap - Espaço da memória onde é armazenado os valores da variáveis; (exemplo malloc)
+Stack - Pilha guarda a informaçao da linha onde está e dá um salto para a função; 
+Static data - Espaço que vou utilizar da memória para variáveis (definido à priori);
+4. Processo que está a executar o código.
+5. Não, está parado em i/o
+6. Registos, estados dos processo e (ver slides)
