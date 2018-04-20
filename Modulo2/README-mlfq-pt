@@ -1,0 +1,159 @@
+O programa mlfq.py permite ver como é que o MLFQ se comporta.
+Como anteriormente, pode usar este programa para criar situações problemáticas,
+utilizando "random seeds", ou uitilizando-o para criar experiências para testar o
+comportamento do MLFQ em diferentes circunstâncias.
+Para correr o programa execute (note que deverá instalar a versão 2 do Python):
+
+python2 mlfq.py
+
+Utilize a flag (-h) para ver as opções (python3 mlfq.py -h):
+
+Usage: mlfq.py [options]
+Options:
+  -h, --help            show this help message and exit
+  -s SEED, --seed=SEED  the random seed
+  -n NUMQUEUES, --numQueues=NUMQUEUES
+                        number of queues in MLFQ (if not using -Q)
+  -q QUANTUM, --quantum=QUANTUM
+                        length of time slice (if not using -Q)
+  -Q QUANTUMLIST, --quantumList=QUANTUMLIST
+                        length of time slice per queue level, 
+                        specified as x,y,z,... where x is the 
+                        quantum length for the highest-priority 
+                        queue, y the next highest, and so forth
+  -j NUMJOBS, --numJobs=NUMJOBS
+                        number of jobs in the system
+  -m MAXLEN, --maxlen=MAXLEN
+                        max run-time of a job (if random)
+  -M MAXIO, --maxio=MAXIO
+                        max I/O frequency of a job (if random)
+  -B BOOST, --boost=BOOST
+                        how often to boost the priority of all 
+                        jobs back to high priority (0 means never)
+  -i IOTIME, --iotime=IOTIME
+                        how long an I/O should last (fixed constant)
+  -S, --stay            reset and stay at same priority level 
+                        when issuing I/O
+  -l JLIST, --jlist=JLIST
+                        a comma-separated list of jobs to run, 
+                        in the form x1,y1,z1:x2,y2,z2:... where 
+                        x is start time, y is run time, and z 
+                        is how often the job issues an I/O request
+  -c                    compute answers for me
+]
+
+Há formas diferentes de utilizar este simulador. Uma primeira forma é gerar aleatoriamente
+tarefas (jobs) e ver se se consegue perceber o seu comportamento dado um determinado escalonador 
+MLFQ. Por exemplo, se pretendemos criar uma três tarefas com formato aleatório:
+
+python2 mlfq.py -j 3
+
+O que se observa depende da definição do problema:
+
+"Here is the list of inputs:
+OPTIONS jobs 3
+OPTIONS queues 3
+OPTIONS quantum length for queue  2 is  10
+OPTIONS quantum length for queue  1 is  10
+OPTIONS quantum length for queue  0 is  10
+OPTIONS boost 0
+OPTIONS ioTime 0
+OPTIONS stayAfterIO False
+
+
+For each job, three defining characteristics are given:
+  startTime : at what time does the job enter the system
+  runTime   : the total CPU time needed by the job to finish
+  ioFreq    : every ioFreq time units, the job issues an I/O
+              (the I/O takes ioTime units to complete)
+
+Job List:
+  Job  0: startTime   0 - runTime  84 - ioFreq   7
+  Job  1: startTime   0 - runTime  42 - ioFreq   2
+  Job  2: startTime   0 - runTime  51 - ioFreq   4
+
+Compute the execution trace for the given workloads.
+If you would like, also compute the response and turnaround
+times for each of the jobs.
+
+Use the -c flag to get the exact results when you are finished."
+
+Este comando gera um workload aleatório das três tarefas (como especificado), com o número
+de filas geradas por defeito com um número de parâmetros também com valores por defeito (
+no output, existem 3 filas, com boost=0, iotime=0 e com quantum igual de 10 para cada uma das filas).
+Se se correr novamente mas agora com a flag (-c), vê-se o seguinte:
+
+"
+Execution Trace:
+
+[time 0] JOB BEGINS by JOB 0
+[time 0] JOB BEGINS by JOB 1
+[time 0] JOB BEGINS by JOB 2
+[time 0] Run JOB 0 at PRI 2 [TICKSLEFT 9 RUNTIME 84 TIMELEFT 83]
+[time 1] Run JOB 0 at PRI 2 [TICKSLEFT 8 RUNTIME 84 TIMELEFT 82]
+[time 2] Run JOB 0 at PRI 2 [TICKSLEFT 7 RUNTIME 84 TIMELEFT 81]
+[time 3] Run JOB 0 at PRI 2 [TICKSLEFT 6 RUNTIME 84 TIMELEFT 80]
+[time 4] Run JOB 0 at PRI 2 [TICKSLEFT 5 RUNTIME 84 TIMELEFT 79]
+[time 5] Run JOB 0 at PRI 2 [TICKSLEFT 4 RUNTIME 84 TIMELEFT 78]
+[time 6] Run JOB 0 at PRI 2 [TICKSLEFT 3 RUNTIME 84 TIMELEFT 77]
+[time 7] IO_START by JOB 0
+[time 7] Run JOB 1 at PRI 2 [TICKSLEFT 9 RUNTIME 42 TIMELEFT 41]
+[time 8] Run JOB 1 at PRI 2 [TICKSLEFT 8 RUNTIME 42 TIMELEFT 40]
+[time 9] IO_START by JOB 1
+
+...
+
+Final statistics:
+  Job  0: startTime   0 - response   0 - turnaround 175
+  Job  1: startTime   0 - response   7 - turnaround 191
+  Job  2: startTime   0 - response   9 - turnaround 168
+
+  Avg  2: startTime n/a - response 5.33 - turnaround 178.00
+"
+O trace mostra exatamente numa escala de milisegundos o que o escalonador decide fazer.
+No exemplo, ele começa por executar a tarefa 0 durante 7ms até essa tarefa iniciar uma E/S (I/O).
+Isto é inteiramente previsível uma vez que a frequência de E/S na tarefa 0 é de 7ms, querendo dizer 
+que, em cada 7ms, vai executar uma E/S e espera que ela se complete antes de reiniciar. No momento em 
+que se inicia a E/S da tarefa 0, o escalonador troca para a tarefa 1 e que executa apenas durante
+2ms até esta também iniciar uma E/S. No ecrã aparecem todas estas informações e, no final,
+aparecem também os tempos de resposta e de retorno para cada tarefa bem como na média.
+
+Podemos controlar vários aspetos da simulação. Por exemplo, podemos especificar quantas filas
+queremos (-n) e qual é a dimensão do quantum (-q). Se quisermos mais controlo, variando por exemplo o
+quantum por fila, podemos especificar o comprimento do quantum por fila utilizando a flag -Q.
+Por exemplo, acrescentando a flag -Q 10,20,30 simula-se um escalonador com três filas,
+com a prioridade mais alta com um quantum de 10 ms, a seguinte com um quantum de 20 ms e a de prioridade
+mais baixa com o valor de quantum de 30. 
+
+Se forem geradas tarefas de forma aleatória, podemos controlar o tempo que elas se 
+executam (-m), com que frequência elas geram E/S (-M). Se, no entanto, desejar mais
+controlo sobre as características exatas das tarefas que correm no sistema, podemos utilizar
+o -l ou --jlist, que permite especificar o tipo de tarefas que se deseja simular.
+A lista tem a forma x1,y1,z1:x2,y2,z2:.... onde x é um tempo de início, y o tempo de execução (isto é,
+quanto CPU o processo usa) e z a frequência de E/S, isto é, depois de executar z ms, a tarefa lança uma E/S. 
+Se z é zero nenhuma E/S é lançada.
+Por exemplo, se quisermos recriar o exemplo dos slides:
+
+python2 mlfq.py --jlist 0,180,0:100,20,0 -Q 10,10,10
+
+Correr o simulador desta forma cria um MLFQ de três níveis, cada nível com um quantum de 10 ms (10 ms time slice).
+Duas tarefas são criadas: Tarefa 0 que se inicia no tempo 0, corre 180 ms no total e nunca dispara uma E/S; a Tarefa 1
+que se inicia nos 100 ms,  só precisa de 20 ms de CPU e nunca dispara uma E/S.
+
+Finalmente, existem três parâmetros adicionais com interes. A flag -B se mudada para um valor diferente de zero, vai
+realizar um "boost" de todas as tarefas para a prioridade mais elevadas cada N milisegundos, quando invocada da seguinte forma:
+python2 mlfq.py -B N 
+
+O escalonador usa esta característica para evitar a inanição (starvation). Ela está desligada por defeito.
+
+A flag -S invoca as velhas regras 4a e 4b, que significa que quando uma tarefa lança uma E/S antes
+de completar o seu "time slice", retornando para a fila com a mesma prioridade com o seu time-slice 
+intacto quando volta à execuação. Estas regras permitem enganar o escalonador.
+
+Finalmente, pode facilmente modificar-se o temp que uma E/S demora utilizando a flag -i. 
+Por defeito no modelo mais simples, uma E/S demora 5 ms.
+
+Pode ainda jogar-se com o facto de as tarefas completarem a E/S ocuparem a cabeça ou a cauda da fila onde estão, utilizando
+a flag -I.
+
+
