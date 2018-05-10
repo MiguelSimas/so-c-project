@@ -1,0 +1,151 @@
+
+Este programa permite testar a tradução de endereços realizada num sistema
+que utiliza a segmentação. A segmentação que este sistema utiliza  é muito
+simples: um espaço de endereços tem apenas *dois* segmentos; para além disso,
+o bit de maior valor (top bit) do endereço virtual gerado pelo processo determina qual 
+dos segmentos se trata: 0 para o segmento 0 (onde ficariam o código e o heap) 
+e 1 para o segemento 1 (onde se encontra o stack).
+O segmento 0 cresce na direção positiva (no sentido de endereços maiores, ou seja para 
+baixo na figura) enquanto o segmento 1 cresce na direção negativa.
+Visualmente, podemos ver:
+
+ |-------------------- | virtual address 0
+ |    seg0                |
+ |                           |
+ |                            |
+ |--------------------|
+ |                            |
+ |                           |
+ |                           |
+ |                          |
+ |(unallocated)     |
+ |                          |
+ |                         |
+ |                         |
+ |----------------  |
+ |                         |
+ |    seg1             |
+ |---------------------| virtual address max (size of address space)
+
+Com a segmentação, existe um par base/limite de registo por segmento.
+Assim, neste problema, existem dois pares. A base do segmento-0 indica-nos
+qual  é o endereço físico do topo do segmento e o limite dá-nos a dimensão
+desse segmento; a base do segmento-1 dá-nos o endereço base (em baixo) do 
+segmento e o limite indica-nos a dimensão do segmento (isto é, até onde pode
+crescer negativamente, ou seja, de baixo para cima).
+Existem dois passos para executar este programa para testar o seu conhecimento
+em segmentação. O primeiro será correr o programa sem flag "-c". para gerar
+um conjunto de traduções para ver se consegue fazer as traduções.
+Na segunda parte, corre com a flag "-c" ativa para confirmar as respostas.
+
+Por exemplo, para correr com as flags por defeito:
+  prompt> python2 segmentation.py
+
+Deve obter o resultado:
+
+"
+  ARG seed 0
+  ARG address space size 1k
+  ARG phys mem size 16k
+  
+  Segment register information:
+
+    Segment 0 base  (grows positive) : 0x00001aea (decimal 6890)
+    Segment 0 limit                  : 472
+
+    Segment 1 base  (grows negative) : 0x00001254 (decimal 4692)
+    Segment 1 limit                  : 450
+
+  Virtual Address Trace
+    VA  0: 0x0000020b (decimal:  523) --> PA or segmentation violation?
+    VA  1: 0x0000019e (decimal:  414) --> PA or segmentation violation?
+    VA  2: 0x00000322 (decimal:  802) --> PA or segmentation violation?
+    VA  3: 0x00000136 (decimal:  310) --> PA or segmentation violation?
+    VA  4: 0x000001e8 (decimal:  488) --> PA or segmentation violation?
+
+  For each virtual address, either write down the physical address it translates
+  to OR write down that it is an out-of-bounds address (a segmentation
+  violation). For this problem, you should assume a simple address space with
+  two segments: the top bit of the virtual address can thus be used to check
+  whether the virtual address is in segment 0 (topbit=0) or segment 1
+  (topbit=1). Note that the base/limit pairs given to you grow in different
+  directions, depending on the segment, i.e., segment 0 grows in the positive
+  direction, whereas segment 1 in the negative.  
+"
+Em seguida, depois de ter calculado as traduções dos endereços, corra o
+programa com a flag "-c" ativa. Vai ver o seguinte resultado.
+
+
+  Virtual Address Trace
+    VA  0: 0x0000020b (decimal:  523) --> SEGMENTATION VIOLATION (SEG1)
+    VA  1: 0x0000019e (decimal:  414) --> VALID in SEG0: 0x00001c88 (decimal: 7304)
+    VA  2: 0x00000322 (decimal:  802) --> VALID in SEG1: 0x00001176 (decimal: 4470)
+    VA  3: 0x00000136 (decimal:  310) --> VALID in SEG0: 0x00001c20 (decimal: 7200)
+    VA  4: 0x000001e8 (decimal:  488) --> SEGMENTATION VIOLATION (SEG0)
+
+Como pode verificar, com a flag "-c", o programa faz a tradução dos endereços.
+Desta forma pode testar a sua compreensão no processo de segmentação.
+
+Claro que, existem alguns parâmetros que pdoe usar para diferentes problemas.
+Em particular, a flag "-s" ou "-seed" que permite gerar problemas aleatórios
+para diferentes valores de "-s".
+Existem também alguns parâmetros que pode utilizar para jogar com 
+espaço de endereços diferentes e memórias físicas. Por exemplo, para 
+experimentar um espaço de endereços muito pequeno, faça:
+
+  prompt> python2 segmentation.py -s 100 -a 16 -p 32
+  ARG seed 0
+  ARG address space size 16
+  ARG phys mem size 32
+ 
+  Segment register information:
+
+    Segment 0 base  (grows positive) : 0x00000018 (decimal 24)
+    Segment 0 limit                  : 4
+
+    Segment 1 base  (grows negative) : 0x00000012 (decimal 18)
+    Segment 1 limit                  : 5
+
+  Virtual Address Trace
+    VA  0: 0x0000000c (decimal:   12) --> PA or segmentation violation?
+    VA  1: 0x00000008 (decimal:    8) --> PA or segmentation violation?
+    VA  2: 0x00000001 (decimal:    1) --> PA or segmentation violation?
+    VA  3: 0x00000007 (decimal:    7) --> PA or segmentation violation?
+    VA  4: 0x00000000 (decimal:    0) --> PA or segmentation violation?
+
+que diz ao programa para gerar um espaço de memória virtual com um
+espaço de endereçamento com a dimensão de 16-byte colocado algures numa
+memória física de 32-byte. Como pode verificar, o espaço de endereçamento
+é muito pequeno (12,8,1,7 e 0). Como pode verificar também, o programa
+seleciona valores para os registo base e limite apropriados. Corra com a
+flag "-c" ativa para ver as respostas.
+
+Este exemplo permite mostrar o que significa cada um dos pares base/limite. 
+Por exemplo, a base do segmento 0 é atribuído ao valor físico da memória 24
+e a sua dimensão é 4-byte. Assim, o endereço virtual 0,1,2 e 3 estão no 
+segmento 0 e são válidos e são mapeados para os endereços físicos 24, 25, 26 e
+27 respetivamente.
+Um pouco mais complexo é o crescimento negativo do segmento 1. No exemplo,
+a base do segmento 1 recebe o endereço físico 18 com uma dimensão de 5 bytes.
+Isto significa que os últimos 5 bytes do espaço de endereçamento virtual, 
+neste caso 11, 12, 13, 14 e 15 são endereços virtuais válidos com o mapeamento
+físico 13, 14, 15, 16 e 17, respetivamente.
+
+Note que pode especificar valores maiores utilizando "k", "m", ou mesmo "g" 
+nos valores que passa com as flags "-a" e "-p", referindo-se a "kilobytes",
+"megabytes" ou "gigabytes". Assim, se quiser realizar traduções numa memória
+com espaço de endereçamento de 1-MB numa memória física de 32-MB, pode 
+executar o seguinte comando:
+
+prompt> python2 segmentation.py -a 1m -p 32m
+
+Se quiser ser mais específico, pode atribuir os valores para os registos 
+base e limite com --bo, --l0 (ou -b, -l) , --b1 e --l1 (ou -B, -L) 
+respetivamente. Experimente.
+
+Finalmente, pode sempre correr 
+
+prompt> python2 segmentation.py -h 
+
+para obter uma lista completa de flags e opções.
+

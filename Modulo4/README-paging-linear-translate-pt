@@ -1,0 +1,111 @@
+Nesta proposta usa-se um programa simples que simula a tradução linear na paginação,
+paging-linear-translate.py.
+Para correr o programa executar python2 paging-linear-translate.py
+Para ver as opções acrescentar a flag -h (help):
+
+"
+Usage: paging-linear-translate.py [options]
+
+Options:
+-h, --help              show this help message and exit
+-s SEED, --seed=SEED    the random seed
+-a ASIZE, --asize=ASIZE 
+                        address space size (e.g., 16, 64k, ...)
+-p PSIZE, --physmem=PSIZE
+                        physical memory size (e.g., 16, 64k, ...)
+-P PAGESIZE, --pagesize=PAGESIZE
+                        page size (e.g., 4k, 8k, ...)
+-n NUM, --addresses=NUM number of virtual addresses to generate
+-u USED, --used=USED    percent of address space that is used
+-v                      verbose mode
+-c                      compute answers for me
+
+First, run the program without any arguments:
+
+ARG seed 0
+ARG address space size 16k
+ARG phys mem size 64k
+ARG page size 4k
+ARG verbose False
+
+The format of the page table is simple:
+The high-order (left-most) bit is the VALID bit.
+  If the bit is 1, the rest of the entry is the PFN.
+  If the bit is 0, the page is not valid.
+Use verbose mode (-v) if you want to print the VPN # by
+each entry of the page table.
+
+Page Table (from entry 0 down to the max size)
+   0x8000000c
+   0x00000000
+   0x00000000
+   0x80000006
+
+Virtual Address Trace
+  VA  0: 0x00003229 (decimal:    12841) --> PA or invalid?
+  VA  1: 0x00001369 (decimal:     4969) --> PA or invalid?
+  VA  2: 0x00001e80 (decimal:     7808) --> PA or invalid?
+  VA  3: 0x00002556 (decimal:     9558) --> PA or invalid?
+  VA  4: 0x00003a1e (decimal:    14878) --> PA or invalid?
+
+For each virtual address, write down the physical address it 
+translates to OR write down that it is an out-of-bounds 
+address (e.g., a segmentation fault).
+"
+Como se pode ver, o programa fornece uma tabela de paginas  de um determinado 
+processo - recordar que num sistema real de paginaçao, 
+existe uma tabela de paginas por processo. Aqui apenas  se considera um processo, o
+seu espaço de endereçamento e, portanto, apenas se considera uma unica pagina.
+A tabela de paginas indica para cada numero de pagina virtual (VPN) a pagina fisica
+(PFN) e questiona sobre a validade ou nao.
+O formato da entrada de pagina  é muito simples: o bit mais  à esquerda  é o bit válido.Os restantes
+bits, se o bit que faz a validaçao é 1, é o PFN
+No exemplo em cima, a tabela de paginas mapei o VPN 0 para o PFN 0xc (decimal 12), VPN3 no
+PFN 0x6 (decimal 6) e deixa as outras paginas virtuais 1 e 2 não válidas.
+
+Uma vez que a tabela de paginas  é linear,  o que é impresso em cima é réplica do que se vê na
+memória. No entanto, por vezes  é mais fácil utilizar o simulador com a flag -v. 
+Esta flag imprime o valor VPN associado ao índice. Por exemplo:
+
+Page Table (from entry 0 down to the max size)
+  [       0]   0x8000000c
+  [       1]   0x00000000
+  [       2]   0x00000000
+  [       3]   0x80000006
+
+A tarefa é usar esta tabela de paginas para traduzir os endereços virtuais dados. Vamos olhar para o primeiro:
+VA 0x3229. Para traduzir este endereço virtual para um endereço físico, primeiro
+vamos separará-lo nas suas diferentes partes: o número virtual da página e o offset.
+Fazê-mo-lo anotando que a dimensão do espaço de endereçamento e a dimensão da página:
+- O espaço de endereçamento  é 16KB
+- A dimensão da página é 4KB
+Assim, sabemos que existem 14 bits no espaço de endereçamento virtual e que existe um offset de 12 bits, 
+deixando os primeiros dois bits para VPN. O endereço 0x3229 que corresponde ao binário 11 0010 0010 1001
+tem os primeiros dois bits associados ao VPN. Assim o endereço corresponde à página 3 com um offset de 0x229.
+
+Olha-se em seguida para a tabela de páginas e verifica-se que VPN 3 é válida e mapeada num
+espaço físico determinado. No caso corresponde à página física 6 e adicionando o offset fica:
+0x6000 OR 0x0229 produzindo 0x6229. O endereço virtual traduz-se para o endereço físico 0x6229. 
+
+Para testar as restantes soluções basta correr com a flag -c:
+
+...
+VA  0: 00003229 (decimal: 12841) --> 00006229 (25129) [VPN 3]
+VA  1: 00001369 (decimal:  4969) --> Invalid (VPN 1 not valid)
+VA  2: 00001e80 (decimal:  7808) --> Invalid (VPN 1 not valid)
+VA  3: 00002556 (decimal:  9558) --> Invalid (VPN 2 not valid)
+VA  4: 00003a1e (decimal: 14878) --> 00006a1e (27166) [VPN 3]
+
+POdemos modificar alguns dos parâmetros para tornar  mais interessante os problemas. 
+Correndo o programa com a flag -h podem ver-se várias opções.
+- A flag s modifica aleatoriamente a semenste gerando diferentes tabelas e diferentes endereços virtuais
+para traduzir
+- A flag -a modifica a dimensão do espaço de endereçamento
+- A flag -p modifica a dimensão do espaço físico de memória.
+- A flag -P modifica a dimensão da página.
+- A flag -n pode ser utilizada para gerar mais endereços para traduzir (em vez dos 5 por defeito)
+- A flag -u modifica a fração de mapeamentos que são válidos de 0% (-u 0) a 100% (-u 100).
+- A flag -v imprime os valors de VPN para tornar mais fácil a tarefa.
+
+
+

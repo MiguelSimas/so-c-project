@@ -1,0 +1,66 @@
+Esta pequena tarefa testa a tua compreensão de como trabalhar a tabela multi-nvíel.
+O programa  é designado:
+  paging-multilevel-translate.py
+
+Algumas assunções básicas:
+- A dimensão da página é muito pequena (32 bytes).
+- O espaço de endereçamento virtual para um processo é de 1024 páginas ou seja
+de 32 KB
+- A memória física é constituída por 128 páginas.
+
+Assim, o endereço virtual precisa de 15 bits (10 para VPN, 5 para offset).
+Um endereço físico requer 12 bits (5 offset, 7 de PFN).
+
+O sistema assume uma tabela de páginas multi-nível. Assim, os primeiros 5 bits do 
+endereço virtual são utilizados para indexar a diretoria da página; a entrada na
+diretoria da página (PDE), se válida, aponta para a página da tabela de páginas.
+Cada tabela de páginas tem 32 entradas (PTEs). Cada PTE, se válida, contém a desejada
+tradução (Physical Frame Number ou PFN) da página virtual em questão.
+
+O formato de uma PTE é, portanto:
+
+  VALID | PFN6 ... PFN0
+
+e, desta forma, tem 8 bits ou 1 byte.
+
+O formato da PDE é identico:
+
+  VALID | PT6 ... PT0
+
+São dadas as seguintes informações.
+
+Primeiro, é dado um valor do registo base da tabela de diretoria de páginas (PDBR)
+que indica qual a página onde a diretoria de páginas está localizada na memória.
+
+Em segundo lugar, é dada a informação completa de cada página na memória (page dump).
+Ela tem o seguinte aspeto:
+
+    page 0: 08 00 01 15 11 1d 1d 1c 01 17 15 14 16 1b 13 0b ...
+    page 1: 19 05 1e 13 02 16 1e 0c 15 09 06 16 00 19 10 03 ...
+    page 2: 1d 07 11 1b 12 05 07 1e 09 1a 18 17 16 18 1a 01 ...
+    ...
+
+que mostra os 32 bytes nas páginas 0,1,2, etc. O primeiro byte (byte 0) na página
+0 tem o valor 0x08, o segundo 0x00, o terceiro 0x01, etc.
+
+Finalmente, é dada uma lista de endereços virtuais para traduzir.
+Use o PDBR para encontrar a entrada de tabela de página relevante para esta página
+virtual. A seguir, procure saber se é válida. Se sim, use a tradução para formar o
+endereço físico final. Com este endereço, pode encontrar-se o valor de referência à
+memória que procuramos.
+
+É claro que o endereço virtual pode não ser válido, gerando uma fallha.
+
+Algumas das opções úteis:
+
+  -s SEED, --seed=SEED       the random seed
+  -n NUM, --addresses=NUM    number of virtual addresses to generate
+  -c, --solve                compute answers for me
+
+Modifica a seed para obter diferentes problemas, como habitual.
+
+Modifica o número do endereço virtual gerado para realizar mais traduções
+dada uma listagem da informação da memória (memory dump).
+
+Usa -c (ou --solve) para mostrar as soluções.
+
