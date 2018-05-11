@@ -1,0 +1,12 @@
+Pag size(-p)	Espaço de Enderecamento(-a)		Nº de paginas de mem virtual
+1k		1m				1024 páginas
+2k		2m				2048 páginas 
+4k		4m				4096 páginas 
+
+
+
+Pag size(-p)	Espaço de Endereçamento(-a)		Nº de páginas
+1k		1m				1024 páginas
+2k		1m				512 páginas
+4k		1m				256 páginas
+8k		1m				128 páginas
