@@ -1,0 +1,35 @@
+Neste trabalho de casa vamos utilizar uma ferramenta do Linux para encontrar
+problemas no código multi-thread, A ferramenta  chama-se "helgrind" e está disponível 
+para descarregar nos repositórios do Linux.
+Vê
+http://valgrind.org/docs/manual/hg-manual.htm 
+para deltalhes acerca da ferramenta, incluíndo como é que se descarrega e
+se instala.
+
+Vamos experimentar um conjunto de programas multi-thread em C e ver como é 
+que a ferramenta faz a depuração do código em diferentes tarefas
+
+Primeiro: Descarrega e instala o valgrind e as ferramentas helgrind associadas.
+Segundo: Escreve "make" para compilar e linkar os diferentes programas.
+Examina o Makefile para perceber o que ele faz.
+A seguir, irás examinar os diferentes códigos dos programas disponíveis:
+
+- main-race.c
+  Uma condição de corrida.
+- main-deadlock.c
+  Um programa que mostra o deadlock
+- main-deadlock-global.c
+  Uma solução para o deadlock
+- main-signal.c
+  Um exemplo de sinalização entre pai e filho
+- main-signal-cv.c
+  Uma forma de sinalização mais eficiente utilizando as variáveis condição.
+- mythreads.h
+  O ficheiro header que permite tornar a verificação dos erros do código mais 
+  fácil de ler.
+
+Com estes programas, podes responder às questões do laboratório em threads.
+
+
+
+
